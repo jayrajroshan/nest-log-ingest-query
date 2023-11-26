@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Log Query Interface</title>
+    <style>
+        /* Add your CSS styling here */
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; padding-top: 20px; }
+        input, button { padding: 10px; margin: 5px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Log Query Interface</h2>
+        <form id="queryForm">
+            <input type="text" id="level" placeholder="Level">
+            <input type="text" id="message" placeholder="Message">
+            <input type="text" id="resourceId" placeholder="Resource ID">
+            <input type="datetime-local" id="startTime" placeholder="Start Time">
+            <input type="datetime-local" id="endTime" placeholder="End Time">
+            <input type="text" id="traceId" placeholder="Trace ID">
+            <input type="text" id="spanId" placeholder="Span ID">
+            <input type="text" id="commit" placeholder="Commit">
+            <input type="text" id="parentResourceId" placeholder="Parent Resource ID">
+            <button type="submit">Query Logs</button>
+        </form>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Message</th>
+                    <th>Resource ID</th>
+                    <th>Timestamp</th>
+                    <th>Trace ID</th>
+                    <th>Span ID</th>
+                    <th>Commit</th>
+                    <th>Parent Resource ID</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('queryForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const level = document.getElementById('level').value;
+            const message = document.getElementById('message').value;
+            const resourceId = document.getElementById('resourceId').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const traceId = document.getElementById('traceId').value;
+            const spanId = document.getElementById('spanId').value;
+            const commit = document.getElementById('commit').value;
+            const parentResourceId = document.getElementById('parentResourceId').value;
+            
+            // Construct the query URL
+            const queryUrl = `http://localhost:3000/query?level=${level}&message=${message}&resourceId=${resourceId}&startTime=${startTime}&endTime=${endTime}&traceId=${traceId}&spanId=${spanId}&commit=${commit}&parentResourceId=${parentResourceId}`;
+            fetch(queryUrl)
+                .then(response => response.json())
+                .then(data => updateResultsTable(data))
+                .catch(error => console.error('Error:', error));
+        });
+
+        function updateResultsTable(data) {
+            const tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing data
+            data.forEach(log => {
+                let row = tableBody.insertRow();
+                row.insertCell(0).innerHTML = log.level;
+                row.insertCell(1).innerHTML = log.message;
+                row.insertCell(2).innerHTML = log.resourceId;
+                row.insertCell(3).innerHTML = log.timestamp;
+                row.insertCell(4).innerHTML = log.traceId;
+                row.insertCell(5).innerHTML = log.spanId;
+                row.insertCell(6).innerHTML = log.commit;
+                row.insertCell(7).innerHTML = log.parentResourceId;
+            });
+        }
+    </script>
+</body>
+</html>
